@@ -56,10 +56,10 @@ RM = D:\CMAKE\bin\cmake.exe -E rm -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = D:\zflag
+CMAKE_SOURCE_DIR = D:\zFlag\zFlag
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = D:\zflag\bin
+CMAKE_BINARY_DIR = D:\zFlag\zFlag\bin
 
 #=============================================================================
 # Targets provided globally by CMake.
@@ -86,9 +86,9 @@ rebuild_cache/fast: rebuild_cache
 
 # The main all target
 all: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start D:\zflag\bin\CMakeFiles D:\zflag\bin\\CMakeFiles\progress.marks
+	$(CMAKE_COMMAND) -E cmake_progress_start D:\zFlag\zFlag\bin\CMakeFiles D:\zFlag\zFlag\bin\\CMakeFiles\progress.marks
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\Makefile2 all
-	$(CMAKE_COMMAND) -E cmake_progress_start D:\zflag\bin\CMakeFiles 0
+	$(CMAKE_COMMAND) -E cmake_progress_start D:\zFlag\zFlag\bin\CMakeFiles 0
 .PHONY : all
 
 # The main clean target

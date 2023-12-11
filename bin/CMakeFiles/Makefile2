@@ -53,10 +53,10 @@ RM = D:\CMAKE\bin\cmake.exe -E rm -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = D:\zflag
+CMAKE_SOURCE_DIR = D:\zFlag\zFlag
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = D:\zflag\bin
+CMAKE_BINARY_DIR = D:\zFlag\zFlag\bin
 
 #=============================================================================
 # Directory level rules for the build root directory
@@ -80,14 +80,14 @@ clean: CMakeFiles/zflag.dir/clean
 CMakeFiles/zflag.dir/all:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\zflag.dir\build.make CMakeFiles/zflag.dir/depend
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\zflag.dir\build.make CMakeFiles/zflag.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=D:\zflag\bin\CMakeFiles --progress-num=1,2 "Built target zflag"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=D:\zFlag\zFlag\bin\CMakeFiles --progress-num=1,2 "Built target zflag"
 .PHONY : CMakeFiles/zflag.dir/all
 
 # Build rule for subdir invocation for target.
 CMakeFiles/zflag.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start D:\zflag\bin\CMakeFiles 2
+	$(CMAKE_COMMAND) -E cmake_progress_start D:\zFlag\zFlag\bin\CMakeFiles 2
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\Makefile2 CMakeFiles/zflag.dir/all
-	$(CMAKE_COMMAND) -E cmake_progress_start D:\zflag\bin\CMakeFiles 0
+	$(CMAKE_COMMAND) -E cmake_progress_start D:\zFlag\zFlag\bin\CMakeFiles 0
 .PHONY : CMakeFiles/zflag.dir/rule
 
 # Convenience name for target.

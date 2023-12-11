@@ -62,6 +62,11 @@ size_t * zflag_size(const char* name, const char * description, uint64_t  defaul
 bool zflag_parse(int argc, char **argv);
 void zflag_print_flags(FILE * _Stream);
 
+#define zflag_type(f_type, v_type) zFlag * flag = zflag_new(f_type, name, description);\
+                                    flag->def_val.v_type = default_value;\
+                                    flag->in_val.v_type = default_value;\
+                                    return &flag->in_val.v_type;\
+
 #endif // ZFLAG_H_
 
 #ifdef ZFLAGS_IMPLEMENTATION 
@@ -92,39 +97,32 @@ zFlag * zflag_new(ZF_Type type, const char* name, const char * description){
 
 bool * zflag_bool(const char* name, const char * description, bool default_value){
 
-    zFlag * flag = zflag_new(F_BOOL, name, description);
-    flag->def_val.as_bool = default_value;
-    flag->in_val.as_bool = default_value;
-    return &flag->in_val.as_bool;
+    zflag_type(F_BOOL, as_bool);
 
 }
 
 char ** zflag_str(const char* name, const char * description, char * default_value){
-    zFlag * flag = zflag_new(F_STRING, name, description);
-    flag->def_val.as_str = default_value;
-    flag->in_val.as_str = default_value;
-    return &flag->in_val.as_str;
+
+    zflag_type(F_STRING, as_str);
+
 }
 
 char * zflag_char(const char* name, const char * description, char  default_value){
-    zFlag * flag = zflag_new(F_CHAR, name, description);
-    flag->def_val.as_char = default_value;
-    flag->in_val.as_char = default_value;
-    return &flag->in_val.as_char;
+
+    zflag_type(F_CHAR, as_char);
+
 }
 
 uint64_t * zflag_uint64(const char* name, const char * description, uint64_t default_value){
-    zFlag * flag = zflag_new(F_UINT64, name, description);
-    flag->def_val.as_uint64 = default_value;
-    flag->in_val.as_uint64 = default_value;
-    return &flag->in_val.as_uint64;
+
+    zflag_type(F_UINT64, as_uint64);
+
 }
 
 size_t * zflag_size(const char* name, const char * description, uint64_t  default_value){
-    zFlag * flag = zflag_new(F_SIZE, name, description);
-    flag->def_val.as_size = default_value;
-    flag->in_val.as_size = default_value;
-    return &flag->in_val.as_size;
+
+    zflag_type(F_SIZE, as_size);
+
 }
 
 bool zflag_parse(int argc, char **argv){
@@ -192,6 +190,11 @@ bool zflag_parse(int argc, char **argv){
                         char *endptr;
                         unsigned long long int result = strtoull(arg, &endptr, 10);
 
+                        if (result == ULLONG_MAX && errno == ERANGE) {
+                            fprintf(stderr, "[ERROR] integer overflow : '%s'\n", flag);
+                            return false;
+                        } 
+
                         c->flags[i].in_val.as_uint64 = result;
                     }break;
                     case F_SIZE: {
@@ -213,18 +216,33 @@ bool zflag_parse(int argc, char **argv){
                         } else if (strcmp(endptr, "G") == 0) {
                             result *= 1024*1024*1024;
                         } else if (strcmp(endptr, "") != 0) {
-                            fprintf(stderr, "[ERROR] wrong prefix used for size '%s'\n", endptr);
+                            fprintf(stderr, "[ERROR] wrong suffix used for size '%s'\n", endptr);
                             return false;
                         }
 
+                        if(*(endptr + 1) != '\0'){
+                            fprintf(stderr, "[ERROR] invalid number '%s'\n", flag);
+                            return false;
+                        }
+
+                        if (result == ULLONG_MAX && errno == ERANGE) {
+                            fprintf(stderr, "[ERROR] integer overflow : '%s'\n", flag);
+                            return false;
+                        }   
+
                         c->flags[i].in_val.as_size = result;
                     }break;
+                    default:{
+                        assert(0 && "unreachable");
+                        exit(EXIT_FAILURE);
+                    }
                 }
                 found = true;
             }
         }
 
         if (!found) {
+            fprintf(stderr, "[ERROR] unknown flag:  '%s'\n", flag);
             return false;
         }
 
@@ -238,32 +256,50 @@ bool zflag_parse(int argc, char **argv){
 void zflag_print_flags(FILE* _Stream){
 
     ZF_Context *c = &g_zflag_context;
+
+    fprintf(_Stream, "[INFO] Flags: \n");
+
     for (size_t i = 0; i < c->flags_count; ++i) {
+
         zFlag *flag = &c->flags[i];
 
-        fprintf(_Stream, "    -%s\n", flag->name);
-        fprintf(_Stream, "        %s\n", flag->description);
         switch (c->flags[i].type) {
-        case F_BOOL:
-            fprintf(_Stream, "        Default: %s\n", flag->def_val.as_bool ? "true" : "false");
-            break;
-        case F_UINT64:
-            fprintf(_Stream, "        Default: %d\n", flag->def_val.as_uint64);
-            break;
-        case F_SIZE:
-            fprintf(_Stream, "        Default: %zu\n", flag->def_val.as_size);
-            break;
-        case F_STRING:
-            if (flag->def_val.as_str) {
-                fprintf(_Stream, "        Default: %s\n", flag->def_val.as_str);
-            }
-            break;
-        default:
-            assert(0 && "unreachable");
-            exit(69);
+            case F_BOOL:{
+                fprintf(_Stream, "[INFO]    Name: -%s\n", flag->name);
+                fprintf(_Stream, "[INFO]        Description: %s\n", flag->description);
+                fprintf(_Stream, "[INFO]        Default: %s\n", flag->def_val.as_bool ? "true" : "false");
+            }break;
+            case F_STRING:{
+                fprintf(_Stream, "[INFO]    Name: -%s <string>\n", flag->name);
+                fprintf(_Stream, "[INFO]        Description: %s\n", flag->description);
+                if (flag->def_val.as_str) {
+                    fprintf(_Stream, "[INFO]        Default: \"%s\"\n", flag->def_val.as_str);
+                }else {
+                    fprintf(_Stream, "[INFO]        Default: (null)\n");
+                }
+            }break;
+            case F_CHAR:{
+                fprintf(_Stream, "[INFO]    Name: -%s <char>\n", flag->name);
+                fprintf(_Stream, "[INFO]        Description: %s\n", flag->description);
+                fprintf(_Stream, "[INFO]        Default: '%c'\n", flag->def_val.as_char);
+            }break;
+            case F_UINT64:{
+                fprintf(_Stream, "[INFO]    Name: -%s <uint64_t number>\n", flag->name);
+                fprintf(_Stream, "[INFO]        Description: %s\n", flag->description);
+                fprintf(_Stream, "[INFO]        Default: %d\n", flag->def_val.as_uint64);
+            }break;
+            case F_SIZE:{
+                fprintf(_Stream, "[INFO]    Name: -%s <uint64_t number[K | M | G]>\n", flag->name);
+                fprintf(_Stream, "[INFO]        Description: %s\n", flag->description);
+                fprintf(_Stream, "[INFO]        Default: %zu\n", flag->def_val.as_size);
+            }break;
+            default:{
+                assert(0 && "unreachable");
+                exit(EXIT_FAILURE);
+            }break;
         }
-    }
 
+    }   
 }
 
 
