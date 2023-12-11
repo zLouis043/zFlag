@@ -81,4 +81,4 @@ int main(int argc, char *argv[]){
    return 0; 
 }
 ```
-### Inspired by [Tsoding video](https://www.youtube.com/watch?v=mpqaQIrVgew&list=PLx1jQleRF4M5LAPzIBgGzOzNRwoJRClXA&index=2&t=7223s)
+### Inspired by Tsoding video : [Rewriting Go's flag module in C](https://www.youtube.com/watch?v=mpqaQIrVgew&list=PLx1jQleRF4M5LAPzIBgGzOzNRwoJRClXA&index=2&t=7223s)
