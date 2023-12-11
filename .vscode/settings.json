@@ -1,0 +1,11 @@
+{
+    "cSpell.words": [
+        "zflag",
+        "ZFLAGS"
+    ],
+    "files.associations": {
+        "stdint.h": "c",
+        "inttypes.h": "c",
+        "zflags.h": "c"
+    }
+}
