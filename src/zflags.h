@@ -150,12 +150,24 @@ bool zflag_parse(int argc, char **argv){
 
         bool found = false;
 
-        for(size_t i = 0; i < c->flags_count && !found; i++){
+        for(size_t i = 0; i < c->flags_count; i++){
 
             if(strncmp(c->flags[i].name, flag, strlen(c->flags[i].name)) == 0){
                 switch (c->flags[i].type) {
-                    case F_BOOL: {;
-                        c->flags[i].in_val.as_bool = true;
+                    case F_BOOL: {
+
+                        if(strcmp(argv[0], "true") == 0 || strcmp(argv[0], "false") == 0){
+
+                            char * arg = zflag_shift_args(&argc, &argv);
+
+                            c->flags[i].in_val.as_bool = (strcmp(arg, "true") == 0) ? true : false;
+
+                        }else {
+
+                            c->flags[i].in_val.as_bool = true;
+
+                        }
+
                     }break;
                     case F_STRING: {
                         
@@ -265,7 +277,7 @@ void zflag_print_flags(FILE* _Stream){
 
         switch (c->flags[i].type) {
             case F_BOOL:{
-                fprintf(_Stream, "[INFO]    Name: -%s\n", flag->name);
+                fprintf(_Stream, "[INFO]    Name: -%s <(optional) true | false>\n", flag->name);
                 fprintf(_Stream, "[INFO]        Description: %s\n", flag->description);
                 fprintf(_Stream, "[INFO]        Default: %s\n", flag->def_val.as_bool ? "true" : "false");
             }break;
@@ -301,6 +313,7 @@ void zflag_print_flags(FILE* _Stream){
 
     }   
 }
+
 
 
 #endif // ZFLAGS_IMPLEMENTATION
